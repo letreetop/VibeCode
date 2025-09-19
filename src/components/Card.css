@@ -1,0 +1,366 @@
+.card-item {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.card-item.editing {
+  border: 2px solid #667eea;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.2);
+}
+
+/* Category-specific styling */
+.card-item.ungraded {
+  border-left: 4px solid #28a745;
+}
+
+.card-item.graded {
+  border-left: 4px solid #6610f2;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(102, 16, 242, 0.05));
+}
+
+.card-item.sealed {
+  border-left: 4px solid #fd7e14;
+}
+
+.card-item.sold {
+  border-left: 4px solid #ffc107;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 193, 7, 0.05));
+  opacity: 0.8;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.category-icon {
+  font-size: 1.2rem;
+}
+
+.card-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.edit-btn, .remove-btn, .save-btn, .cancel-btn, .sell-btn, .duplicate-btn {
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.edit-btn {
+  background: linear-gradient(135deg, #74b9ff, #0984e3);
+  color: white;
+}
+
+.edit-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(116, 185, 255, 0.4);
+}
+
+.remove-btn {
+  background: linear-gradient(135deg, #ff7675, #d63031);
+  color: white;
+}
+
+.remove-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 118, 117, 0.4);
+}
+
+.sell-btn {
+  background: linear-gradient(135deg, #ffc107, #e0a800);
+  color: #212529;
+  font-weight: 700;
+}
+
+.sell-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 193, 7, 0.4);
+}
+
+.duplicate-btn {
+  background: linear-gradient(135deg, #20c997, #17a2b8);
+  color: white;
+}
+
+.duplicate-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(32, 201, 151, 0.4);
+}
+
+.save-btn {
+  background: linear-gradient(135deg, #00b894, #00a085);
+  color: white;
+}
+
+.save-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 184, 148, 0.4);
+}
+
+.cancel-btn {
+  background: #ddd;
+  color: #666;
+}
+
+.cancel-btn:hover {
+  background: #ccc;
+}
+
+.card-content {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.card-image {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.card-image img {
+  width: 120px;
+  height: 168px;
+  object-fit: contain;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  border-radius: 12px;
+  padding: 0.5rem;
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.card-image img:hover {
+  transform: scale(1.05);
+}
+
+.card-info {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.set-info {
+  margin-bottom: 0.75rem;
+}
+
+.set-name {
+  font-size: 1rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.card-number {
+  font-size: 0.9rem;
+  color: #999;
+  margin-left: 0.5rem;
+}
+
+.rarity-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.card-stats {
+  background: rgba(248, 249, 250, 0.8);
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.price-row .stat-value.price {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #28a745;
+}
+
+.sale-price-row .stat-value.sale-price {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #17a2b8;
+}
+
+.profit-row .stat-value.profit {
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.profit-row .stat-value.profit.positive {
+  color: #28a745;
+}
+
+.profit-row .stat-value.profit.negative {
+  color: #dc3545;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-label {
+  font-weight: 600;
+  color: #555;
+}
+
+.stat-value {
+  font-weight: 700;
+  color: #333;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.card-meta {
+  background: rgba(248, 249, 250, 0.5);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+
+.meta-row.notes {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding-top: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.meta-row.notes .meta-value {
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.meta-row:last-child {
+  border-bottom: none;
+}
+
+.meta-label {
+  font-weight: 500;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.meta-value {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.edit-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  transition: border-color 0.3s ease;
+}
+
+.edit-input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.edit-input.name-input {
+  font-size: 1.2rem;
+  font-weight: 600;
+  flex: 1;
+}
+
+.detail-group {
+  margin-bottom: 1rem;
+}
+
+.detail-group label {
+  display: block;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .pokemon-card {
+    padding: 1rem;
+  }
+  
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .card-actions {
+    align-self: stretch;
+    justify-content: space-between;
+  }
+  
+  .card-image img {
+    width: 100px;
+    height: 140px;
+  }
+  
+  .card-name {
+    font-size: 1.3rem;
+  }
+  
+}
