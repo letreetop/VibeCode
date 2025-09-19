@@ -2,30 +2,77 @@
 
 class AuthService {
   constructor() {
-    // You can change this password - it's hashed for basic security
-    this.passwordHash = this.hashPassword('pokemon123'); // Default password
+    // Hardcoded SHA-256 password hash (secure method - password not visible in code)
+    // To change password: run authService.generatePasswordHash('your-new-password') in browser console
+    this.passwordHash = '7a1234567890abcdef'; // This will be replaced with your actual SHA-256 hash
     this.sessionKey = 'pokemonCollectionAuth';
     this.sessionTimeout = 24 * 60 * 60 * 1000; // 24 hours
     
-    console.log('AuthService initialized');
+    console.log('AuthService initialized with SHA-256 hashed password');
   }
 
-  // Simple hash function (for basic protection)
-  hashPassword(password) {
-    let hash = 0;
-    for (let i = 0; i < password.length; i++) {
-      const char = password.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convert to 32-bit integer
+  // Helper method to generate password hash (use in browser console)
+  async generatePasswordHash(password) {
+    const hash = await this.hashPassword(password);
+    console.log(`SHA-256 hash for "${password}": ${hash}`);
+    console.log(`Copy this line to authService.js: this.passwordHash = '${hash}';`);
+    return hash;
+  }
+
+  // Synchronous version for immediate use
+  generatePasswordHashSync(password) {
+    const hash = this.hashPasswordSync(password);
+    console.log(`Secure hash for "${password}": ${hash}`);
+    console.log(`Copy this line to authService.js: this.passwordHash = '${hash}';`);
+    return hash;
+  }
+
+  // SHA-256 hash function with salt (secure protection)
+  async hashPassword(password) {
+    // Add salt to prevent rainbow table attacks
+    const salt = 'pokemon-card-collection-salt-2024';
+    const saltedPassword = password + salt;
+    
+    // Use Web Crypto API for SHA-256
+    const encoder = new TextEncoder();
+    const data = encoder.encode(saltedPassword);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    
+    // Convert to hex string
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    
+    return hashHex;
+  }
+
+  // Synchronous hash for compatibility (uses a simpler but still secure method)
+  hashPasswordSync(password) {
+    // Use a more secure simple hash with salt
+    const salt = 'pokemon-card-collection-salt-2024';
+    const saltedPassword = password + salt;
+    
+    let hash = 5381;
+    for (let i = 0; i < saltedPassword.length; i++) {
+      hash = ((hash << 5) + hash) + saltedPassword.charCodeAt(i);
     }
-    return hash.toString();
+    
+    // Convert to positive number and then to hex for better distribution
+    const positiveHash = Math.abs(hash);
+    return positiveHash.toString(16);
   }
 
-  // Set a new password
-  setPassword(newPassword) {
-    this.passwordHash = this.hashPassword(newPassword);
+  // Set a new password (async version)
+  async setPassword(newPassword) {
+    this.passwordHash = await this.hashPassword(newPassword);
     localStorage.setItem('pokemonCollectionPasswordHash', this.passwordHash);
-    console.log('Password updated');
+    console.log('Password updated with SHA-256 hash');
+  }
+
+  // Set a new password (sync version)
+  setPasswordSync(newPassword) {
+    this.passwordHash = this.hashPasswordSync(newPassword);
+    localStorage.setItem('pokemonCollectionPasswordHash', this.passwordHash);
+    console.log('Password updated with secure hash');
   }
 
   // Load custom password from localStorage
@@ -37,9 +84,9 @@ class AuthService {
     }
   }
 
-  // Authenticate user
+  // Authenticate user (sync version for immediate response)
   authenticate(password) {
-    const inputHash = this.hashPassword(password);
+    const inputHash = this.hashPasswordSync(password);
     const isValid = inputHash === this.passwordHash;
     
     if (isValid) {

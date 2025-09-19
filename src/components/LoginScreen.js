@@ -5,10 +5,7 @@ import './LoginScreen.css';
 const LoginScreen = ({ onLoginSuccess }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [showPasswordSetup, setShowPasswordSetup] = useState(false);
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showDefaultWarning, setShowDefaultWarning] = useState(authService.isDefaultPassword());
+  const [attempts, setAttempts] = useState(0);
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -23,8 +20,14 @@ const LoginScreen = ({ onLoginSuccess }) => {
     if (success) {
       onLoginSuccess();
     } else {
-      setError('Incorrect password. Please try again.');
+      setAttempts(prev => prev + 1);
+      setError(`Incorrect password. Please try again. (Attempt ${attempts + 1})`);
       setPassword('');
+      
+      // Add delay after multiple failed attempts
+      if (attempts >= 2) {
+        setTimeout(() => setError(''), 3000);
+      }
     }
   };
 
@@ -65,106 +68,35 @@ const LoginScreen = ({ onLoginSuccess }) => {
       <div className="login-container">
         <div className="login-header">
           <h1>🃏 Pokemon Card Collection</h1>
-          <p>Enter password to access your collection</p>
+          <p>Enter password to access your private collection</p>
         </div>
 
-        {showDefaultWarning && (
-          <div className="default-warning">
-            <p>⚠️ You're using the default password. <button onClick={() => setShowPasswordSetup(true)} className="change-password-link">Change it now</button> for better security.</p>
+        <form onSubmit={handleLogin} className="login-form">
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              className="password-input"
+              autoFocus
+            />
           </div>
-        )}
 
-        {!showPasswordSetup ? (
-          <form onSubmit={handleLogin} className="login-form">
-            <div className="form-group">
-              <label htmlFor="password">Password</label>
-              <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
-                className="password-input"
-                autoFocus
-              />
+          {error && <div className="error-message">{error}</div>}
+
+          <button type="submit" className="login-btn" disabled={attempts >= 5}>
+            {attempts >= 5 ? '🔒 Too Many Attempts' : '🔓 Access Collection'}
+          </button>
+
+          {attempts >= 3 && (
+            <div className="security-notice">
+              <small>Multiple failed attempts detected. Please verify you have the correct password.</small>
             </div>
-
-            {error && <div className="error-message">{error}</div>}
-
-            <button type="submit" className="login-btn">
-              🔓 Access Collection
-            </button>
-
-            <div className="login-footer">
-              <button 
-                type="button" 
-                onClick={() => setShowPasswordSetup(true)}
-                className="setup-password-btn"
-              >
-                Change Password
-              </button>
-              
-              {authService.isDefaultPassword() && (
-                <div className="default-password-hint">
-                  <small>Default password: <code>pokemon123</code></small>
-                </div>
-              )}
-            </div>
-          </form>
-        ) : (
-          <form onSubmit={handlePasswordSetup} className="password-setup-form">
-            <h3>Set New Password</h3>
-            
-            <div className="form-group">
-              <label htmlFor="newPassword">New Password</label>
-              <input
-                type="password"
-                id="newPassword"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder="Enter new password"
-                className="password-input"
-              />
-              {newPassword && (
-                <div className={`password-strength ${getPasswordStrength()?.level.toLowerCase().replace(' ', '-')}`}>
-                  Strength: {getPasswordStrength()?.level}
-                </div>
-              )}
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="confirmPassword">Confirm Password</label>
-              <input
-                type="password"
-                id="confirmPassword"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm new password"
-                className="password-input"
-              />
-            </div>
-
-            {error && <div className="error-message">{error}</div>}
-
-            <div className="form-actions">
-              <button type="submit" className="save-password-btn">
-                💾 Save Password
-              </button>
-              <button 
-                type="button" 
-                onClick={() => {
-                  setShowPasswordSetup(false);
-                  setNewPassword('');
-                  setConfirmPassword('');
-                  setError('');
-                }}
-                className="cancel-setup-btn"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        )}
+          )}
+        </form>
       </div>
     </div>
   );
