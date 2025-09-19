@@ -8,7 +8,9 @@ import { sampleCardData, categories, allCategories } from './data/pokemonData';
 import exportService from './services/exportService';
 import googleDriveService from './services/googleDriveService';
 import gradingService from './services/gradingService';
+import authService from './services/authService';
 import ApiKeyManager from './components/ApiKeyManager';
+import LoginScreen from './components/LoginScreen';
 
 function App() {
   const [cards, setCards] = useState([]);
@@ -21,19 +23,28 @@ function App() {
   const [isGoogleDriveConnected, setIsGoogleDriveConnected] = useState(false);
   const [autoSyncEnabled, setAutoSyncEnabled] = useState(false);
   const [psaApiKey, setPsaApiKey] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Load data from localStorage or use sample data
+  // Check authentication on app load
   useEffect(() => {
-    const savedCards = localStorage.getItem('pokemonCardInventory');
-    if (savedCards) {
-      const parsedCards = JSON.parse(savedCards);
-      setCards(parsedCards);
-      setFilteredCards(parsedCards);
-    } else {
-      setCards(sampleCardData);
-      setFilteredCards(sampleCardData);
-    }
+    const authenticated = authService.isAuthenticated();
+    setIsAuthenticated(authenticated);
   }, []);
+
+  // Load data from localStorage or use sample data (only when authenticated)
+  useEffect(() => {
+    if (isAuthenticated) {
+      const savedCards = localStorage.getItem('pokemonCardInventory');
+      if (savedCards) {
+        const parsedCards = JSON.parse(savedCards);
+        setCards(parsedCards);
+        setFilteredCards(parsedCards);
+      } else {
+        setCards(sampleCardData);
+        setFilteredCards(sampleCardData);
+      }
+    }
+  }, [isAuthenticated]);
 
   // Save to localStorage whenever card data changes
   useEffect(() => {
@@ -281,6 +292,22 @@ function App() {
     }
   ];
 
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    authService.logout();
+    setIsAuthenticated(false);
+    setCards([]);
+    setFilteredCards([]);
+  };
+
+  // Show login screen if not authenticated
+  if (!isAuthenticated) {
+    return <LoginScreen onLoginSuccess={handleLoginSuccess} />;
+  }
+
   return (
     <div className="App">
       <header className="app-header">
@@ -288,6 +315,9 @@ function App() {
           <h1>Pokemon Card Collection</h1>
           <p>Track, manage, and analyze your collection</p>
         </div>
+        <button onClick={handleLogout} className="logout-btn" title="Logout">
+          🚪 Logout
+        </button>
       </header>
 
       <main className="main-content">
