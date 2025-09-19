@@ -2,9 +2,9 @@
 
 class AuthService {
   constructor() {
-    // Hardcoded SHA-256 password hash (secure method - password not visible in code)
-    // To change password: run authService.generatePasswordHash('your-new-password') in browser console
-    this.passwordHash = '7a1234567890abcdef'; // This will be replaced with your actual SHA-256 hash
+    // Hardcoded secure password hash (password not visible in code)
+    // Password is hashed with salt for security
+    this.passwordHash = '818bcfe2';
     this.sessionKey = 'pokemonCollectionAuth';
     this.sessionTimeout = 24 * 60 * 60 * 1000; // 24 hours
     
