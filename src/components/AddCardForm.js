@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { cardSets, cardRarities, cardConditions, gradingCompanies, sealedTypes, categories } from '../data/pokemonData';
 import gradingService from '../services/gradingService';
+import sharedDatabaseService from '../services/sharedDatabaseService';
 import './AddCardForm.css';
 
 const AddCardForm = ({ onAddCard, onCancel, initialCategory = 'ungraded' }) => {
@@ -24,6 +25,8 @@ const AddCardForm = ({ onAddCard, onCancel, initialCategory = 'ungraded' }) => {
   const [errors, setErrors] = useState({});
   const [isLookingUp, setIsLookingUp] = useState(false);
   const [lookupMessage, setLookupMessage] = useState('');
+  const [itemSuggestions, setItemSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,6 +41,63 @@ const AddCardForm = ({ onAddCard, onCancel, initialCategory = 'ungraded' }) => {
         [name]: ''
       }));
     }
+  };
+
+  // Handle item lookup from shared database
+  const handleItemLookup = async (itemName) => {
+    if (itemName.length < 2) {
+      setItemSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    try {
+      let suggestions = [];
+      
+      if (formData.category === 'ungraded') {
+        suggestions = await sharedDatabaseService.searchCards(itemName);
+      } else if (formData.category === 'sealed') {
+        suggestions = await sharedDatabaseService.searchSealedProducts(itemName);
+      }
+      
+      if (suggestions.length > 0) {
+        setItemSuggestions(suggestions);
+        setShowSuggestions(true);
+      } else {
+        setItemSuggestions([]);
+        setShowSuggestions(false);
+      }
+    } catch (error) {
+      console.error('Item lookup failed:', error);
+      setItemSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  // Handle selecting an item from suggestions
+  const handleSelectItem = (selectedItem) => {
+    if (formData.category === 'ungraded') {
+      setFormData(prev => ({
+        ...prev,
+        name: selectedItem.name,
+        set: selectedItem.set,
+        cardNumber: selectedItem.cardNumber,
+        rarity: selectedItem.rarity,
+        image: selectedItem.image
+      }));
+    } else if (formData.category === 'sealed') {
+      setFormData(prev => ({
+        ...prev,
+        name: selectedItem.name,
+        set: selectedItem.set,
+        type: selectedItem.type,
+        image: selectedItem.image,
+        notes: selectedItem.description
+      }));
+    }
+    
+    setShowSuggestions(false);
+    setItemSuggestions([]);
   };
 
   // Handle certification number lookup

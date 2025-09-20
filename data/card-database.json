@@ -1,0 +1,71 @@
+{
+  "cards": [
+    {
+      "id": "charizard-base-set-4",
+      "name": "Charizard",
+      "set": "Base Set",
+      "cardNumber": "4/102",
+      "rarity": "Holo Rare",
+      "image": "https://images.pokemontcg.io/base1/4_hires.png",
+      "category": "ungraded",
+      "addedBy": "system",
+      "addedDate": "2024-09-18"
+    },
+    {
+      "id": "blastoise-base-set-2",
+      "name": "Blastoise", 
+      "set": "Base Set",
+      "cardNumber": "2/102",
+      "rarity": "Holo Rare",
+      "image": "https://images.pokemontcg.io/base1/2_hires.png",
+      "category": "ungraded",
+      "addedBy": "system",
+      "addedDate": "2024-09-18"
+    },
+    {
+      "id": "venusaur-base-set-15",
+      "name": "Venusaur",
+      "set": "Base Set", 
+      "cardNumber": "15/102",
+      "rarity": "Holo Rare",
+      "image": "https://images.pokemontcg.io/base1/15_hires.png",
+      "category": "ungraded",
+      "addedBy": "system",
+      "addedDate": "2024-09-18"
+    }
+  ],
+  "sealedProducts": [
+    {
+      "id": "base-set-booster-box",
+      "name": "Base Set Booster Box",
+      "set": "Base Set",
+      "type": "booster_box",
+      "image": "https://images.pokemontcg.io/base1/logo.png",
+      "description": "36 booster packs, 11 cards per pack",
+      "addedBy": "system",
+      "addedDate": "2024-09-18"
+    },
+    {
+      "id": "jungle-booster-box", 
+      "name": "Jungle Booster Box",
+      "set": "Jungle",
+      "type": "booster_box",
+      "image": "https://images.pokemontcg.io/base2/logo.png",
+      "description": "36 booster packs, 11 cards per pack",
+      "addedBy": "system",
+      "addedDate": "2024-09-18"
+    },
+    {
+      "id": "evolving-skies-etb",
+      "name": "Evolving Skies Elite Trainer Box",
+      "set": "Evolving Skies", 
+      "type": "elite_trainer_box",
+      "image": "https://images.pokemontcg.io/swsh7/logo.png",
+      "description": "10 booster packs, accessories, and more",
+      "addedBy": "system",
+      "addedDate": "2024-09-18"
+    }
+  ],
+  "lastUpdated": "2024-09-18T10:00:00Z",
+  "version": "1.0"
+}

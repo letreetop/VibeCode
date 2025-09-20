@@ -9,7 +9,7 @@ import exportService from './services/exportService';
 import googleDriveService from './services/googleDriveService';
 import gradingService from './services/gradingService';
 import authService from './services/authService';
-import repositoryStorageService from './services/repositoryStorageService';
+import sharedDatabaseService from './services/sharedDatabaseService';
 import ApiKeyManager from './components/ApiKeyManager';
 import LoginScreen from './components/LoginScreen';
 
@@ -32,40 +32,9 @@ function App() {
     setIsAuthenticated(authenticated);
   }, []);
 
-  // Load data from repository or localStorage (only when authenticated)
+  // Load data from localStorage or use sample data (only when authenticated)
   useEffect(() => {
     if (isAuthenticated) {
-      loadCollectionData();
-    }
-  }, [isAuthenticated]);
-
-  const loadCollectionData = async () => {
-    try {
-      // Try to load from repository first
-      const repoResult = await repositoryStorageService.loadCollection();
-      
-      if (repoResult.success && repoResult.data.cards?.length > 0) {
-        console.log('Loaded collection from repository');
-        setCards(repoResult.data.cards);
-        setFilteredCards(repoResult.data.cards);
-        // Also save to localStorage as backup
-        localStorage.setItem('pokemonCardInventory', JSON.stringify(repoResult.data.cards));
-        localStorage.setItem('collectionLastUpdated', repoResult.data.lastUpdated || new Date().toISOString());
-      } else {
-        // Fallback to localStorage
-        const savedCards = localStorage.getItem('pokemonCardInventory');
-        if (savedCards) {
-          const parsedCards = JSON.parse(savedCards);
-          setCards(parsedCards);
-          setFilteredCards(parsedCards);
-        } else {
-          setCards(sampleCardData);
-          setFilteredCards(sampleCardData);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to load collection:', error);
-      // Fallback to localStorage
       const savedCards = localStorage.getItem('pokemonCardInventory');
       if (savedCards) {
         const parsedCards = JSON.parse(savedCards);
@@ -76,35 +45,12 @@ function App() {
         setFilteredCards(sampleCardData);
       }
     }
-  };
+  }, [isAuthenticated]);
 
-  // Save to localStorage and repository whenever card data changes
+  // Save to localStorage whenever card data changes
   useEffect(() => {
-    if (cards.length > 0) {
-      localStorage.setItem('pokemonCardInventory', JSON.stringify(cards));
-      localStorage.setItem('collectionLastUpdated', new Date().toISOString());
-      
-      // Auto-sync to repository if available
-      const syncTimeout = setTimeout(() => {
-        syncToRepository();
-      }, 3000); // Debounce: wait 3 seconds after last change
-      
-      return () => clearTimeout(syncTimeout);
-    }
+    localStorage.setItem('pokemonCardInventory', JSON.stringify(cards));
   }, [cards]);
-
-  const syncToRepository = async () => {
-    if (repositoryStorageService.isAvailable()) {
-      try {
-        const result = await repositoryStorageService.saveCollection(cards, repositoryStorageService.getStoredGitHubToken());
-        if (result.success) {
-          console.log('Collection auto-synced to repository');
-        }
-      } catch (error) {
-        console.error('Auto-sync to repository failed:', error);
-      }
-    }
-  };
 
   // Filter cards based on search term, set, and category
   useEffect(() => {
@@ -138,11 +84,22 @@ function App() {
   const addCard = (newCard) => {
     const cardWithId = {
       ...newCard,
-      id: Date.now() // Simple ID generation
+      id: Date.now() + Math.random() // Simple ID generation
     };
     setCards([...cards, cardWithId]);
     setShowAddForm(false);
     setAddFormCategory('ungraded');
+    
+    // Add to shared database for future users
+    addToSharedDatabase(newCard);
+  };
+
+  const addToSharedDatabase = async (cardData) => {
+    // Log that this item could be added to shared database
+    console.log('New item added - could contribute to shared database:', cardData.name);
+    
+    // In the future, this could automatically add to the shared database
+    // For now, it builds up a local database that could be contributed
   };
 
   const handleAddCard = (category) => {
@@ -426,13 +383,6 @@ function App() {
               />
             </label>
             
-            <button 
-              className="utility-btn sync"
-              onClick={() => syncToRepository()}
-              title="Sync collection to repository"
-            >
-              🔄 Sync
-            </button>
           </div>
         </div>
 
