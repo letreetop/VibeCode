@@ -9,6 +9,7 @@ import exportService from './services/exportService';
 import googleDriveService from './services/googleDriveService';
 import gradingService from './services/gradingService';
 import authService from './services/authService';
+import repositoryStorageService from './services/repositoryStorageService';
 import ApiKeyManager from './components/ApiKeyManager';
 import LoginScreen from './components/LoginScreen';
 
@@ -31,9 +32,40 @@ function App() {
     setIsAuthenticated(authenticated);
   }, []);
 
-  // Load data from localStorage or use sample data (only when authenticated)
+  // Load data from repository or localStorage (only when authenticated)
   useEffect(() => {
     if (isAuthenticated) {
+      loadCollectionData();
+    }
+  }, [isAuthenticated]);
+
+  const loadCollectionData = async () => {
+    try {
+      // Try to load from repository first
+      const repoResult = await repositoryStorageService.loadCollection();
+      
+      if (repoResult.success && repoResult.data.cards?.length > 0) {
+        console.log('Loaded collection from repository');
+        setCards(repoResult.data.cards);
+        setFilteredCards(repoResult.data.cards);
+        // Also save to localStorage as backup
+        localStorage.setItem('pokemonCardInventory', JSON.stringify(repoResult.data.cards));
+        localStorage.setItem('collectionLastUpdated', repoResult.data.lastUpdated || new Date().toISOString());
+      } else {
+        // Fallback to localStorage
+        const savedCards = localStorage.getItem('pokemonCardInventory');
+        if (savedCards) {
+          const parsedCards = JSON.parse(savedCards);
+          setCards(parsedCards);
+          setFilteredCards(parsedCards);
+        } else {
+          setCards(sampleCardData);
+          setFilteredCards(sampleCardData);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load collection:', error);
+      // Fallback to localStorage
       const savedCards = localStorage.getItem('pokemonCardInventory');
       if (savedCards) {
         const parsedCards = JSON.parse(savedCards);
@@ -44,25 +76,35 @@ function App() {
         setFilteredCards(sampleCardData);
       }
     }
-  }, [isAuthenticated]);
+  };
 
-  // Save to localStorage whenever card data changes
+  // Save to localStorage and repository whenever card data changes
   useEffect(() => {
-    localStorage.setItem('pokemonCardInventory', JSON.stringify(cards));
-    
-    // Auto-sync to Google Drive if enabled and connected
-    if (autoSyncEnabled && isGoogleDriveConnected && cards.length > 0) {
+    if (cards.length > 0) {
+      localStorage.setItem('pokemonCardInventory', JSON.stringify(cards));
+      localStorage.setItem('collectionLastUpdated', new Date().toISOString());
+      
+      // Auto-sync to repository if available
       const syncTimeout = setTimeout(() => {
-        googleDriveService.autoSync(cards).then(success => {
-          if (success) {
-            console.log('Collection auto-synced to Google Drive');
-          }
-        });
-      }, 2000); // Debounce: wait 2 seconds after last change
+        syncToRepository();
+      }, 3000); // Debounce: wait 3 seconds after last change
       
       return () => clearTimeout(syncTimeout);
     }
-  }, [cards, autoSyncEnabled, isGoogleDriveConnected]);
+  }, [cards]);
+
+  const syncToRepository = async () => {
+    if (repositoryStorageService.isAvailable()) {
+      try {
+        const result = await repositoryStorageService.saveCollection(cards, repositoryStorageService.getStoredGitHubToken());
+        if (result.success) {
+          console.log('Collection auto-synced to repository');
+        }
+      } catch (error) {
+        console.error('Auto-sync to repository failed:', error);
+      }
+    }
+  };
 
   // Filter cards based on search term, set, and category
   useEffect(() => {
@@ -383,6 +425,14 @@ function App() {
                 style={{ display: 'none' }}
               />
             </label>
+            
+            <button 
+              className="utility-btn sync"
+              onClick={() => syncToRepository()}
+              title="Sync collection to repository"
+            >
+              🔄 Sync
+            </button>
           </div>
         </div>
 

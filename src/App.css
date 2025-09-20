@@ -156,6 +156,16 @@
   box-shadow: 0 4px 12px rgba(111, 66, 193, 0.4);
 }
 
+.utility-btn.sync {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+.utility-btn.sync:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+}
+
 .add-card-btn.ungraded {
   background: linear-gradient(135deg, #28a745, #20c997);
   box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
